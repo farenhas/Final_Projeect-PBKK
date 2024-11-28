@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Gallery</title>
+</head>
+<body>
+    <h1>Photo Gallery</h1>
+    <div id="gallery"></div>
+
+    <script>
+        fetch("/api/photos")
+            .then(res => res.json())
+            .then(data => {
+                const gallery = document.getElementById("gallery");
+                data.data.forEach(photo => {
+                    const img = document.createElement("img");
+                    img.src = photo.image_path;
+                    img.alt = photo.title;
+                    img.style.width = "200px";
+                    img.style.margin = "10px";
+                    gallery.appendChild(img);
+                });
+            });
+    </script>
+</body>
+</html>
