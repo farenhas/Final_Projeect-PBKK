@@ -11,10 +11,29 @@
       height: 300px;
     }
 
+    .card-container {
+      position: relative;
+      max-width: 500px;
+      margin: auto;
+      margin-top: -100px;
+      backdrop-filter: blur(30px);
+      animation: pulse-shadow 1.5s infinite;
+    }
+
+    @keyframes pulse-shadow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(132, 94, 194, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(132, 94, 194, 1);
+      }
+    }
+
     .card {
       background: linear-gradient(135deg, #1b1f38, #292c51);
       color: white;
       border-radius: 15px;
+      padding: 20px;
     }
 
     .form-control {
@@ -63,49 +82,48 @@
 <body>
   <section class="text-center">
     <div class="p-5 bg-image"></div>
-    <div class="card mx-4 mx-md-5 shadow-5-strong" style="
-          margin-top: -100px;
-          backdrop-filter: blur(30px);
-          ">
-      <div class="card-body py-5 px-md-5">
-        <div class="row d-flex justify-content-center">
-          <div class="col-lg-6">
-            <h2 class="fw-bold mb-5">Login</h2>
-            <form action="/api/login" method="POST">
-                
-            <!-- Success Message -->
-            {{ if .success }}
-            <div class="alert alert-success" role="alert">
-                 {{ .success }}
-            </div>
+    <div class="card-container shadow-lg">
+      <div class="card mx-4 mx-md-5">
+        <div class="card-body py-5 px-md-5">
+          <div class="row d-flex justify-content-center">
+            <div class="col-lg-12">
+              <h2 class="fw-bold mb-5">Login</h2>
+              <form action="/api/login" method="POST">
+
+                <!-- Success Message -->
+                {{ if .success }}
+                <div class="alert alert-success" role="alert">
+                  {{ .success }}
+                </div>
                 {{ end }}
 
-              <!-- Error Message -->
-              {{ if .error }}
-              <div class="alert alert-danger" role="alert">
-                {{ .error }}
-              </div>
-              {{ end }}
+                <!-- Error Message -->
+                {{ if .error }}
+                <div class="alert alert-danger" role="alert">
+                  {{ .error }}
+                </div>
+                {{ end }}
 
-              <!-- Username -->
-              <div class="mb-4">
-                <input type="text" id="username" name="username" class="form-control" required />
-                <label class="form-label" for="username">Username</label>
-              </div>
+                <!-- Username -->
+                <div class="mb-4">
+                  <input type="text" id="username" name="username" class="form-control" required />
+                  <label class="form-label" for="username">Username</label>
+                </div>
 
-              <!-- Password -->
-              <div class="mb-4">
-                <input type="password" id="password" name="password" class="form-control" required />
-                <label class="form-label" for="password">Password</label>
-              </div>
+                <!-- Password -->
+                <div class="mb-4">
+                  <input type="password" id="password" name="password" class="form-control" required />
+                  <label class="form-label" for="password">Password</label>
+                </div>
 
-              <!-- Submit button -->
-              <button type="submit" class="btn btn-primary btn-block mb-4">Login</button>
-            </form>
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary btn-block mb-4">Login</button>
+              </form>
 
-            <!-- Sign Up Button -->
-            <p>Don't have an account?</p>
-            <a href="/signup" class="btn btn-secondary btn-block">Sign Up</a>
+              <!-- Sign Up Button -->
+              <p>Don't have an account?</p>
+              <a href="/signup" class="btn btn-secondary btn-block">Sign Up</a>
+            </div>
           </div>
         </div>
       </div>
