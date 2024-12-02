@@ -2,9 +2,9 @@ package routes
 
 import (
 	"net/http"
+	"photo_gallery/config"
 	"photo_gallery/controllers"
 	"photo_gallery/models"
-	"photo_gallery/config"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,25 +35,32 @@ func SetupRoutes(router *gin.Engine) {
 	// Route untuk proses registrasi
 	router.POST("/api/register", controllers.RegisterUser)
 
-
 	// Route untuk halaman dashboard
 	router.GET("/dashboard", func(c *gin.Context) {
-    var photos []models.Photo
-    // Mencoba memuat data foto dari database, menampilkan pesan error jika terjadi masalah
-    if err := config.DB.Preload("Category").Find(&photos).Error; err != nil {
-        c.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
-            "error": "Unable to load photos from database",
-            "Photos": []models.Photo{},
-        })
-        return
-    }
+		var photos []models.Photo
+		query := c.Query("query")
+		// Mencoba memuat data foto dari database, menampilkan pesan error jika terjadi masalah
+		dbQuery := config.DB.Preload("Category")
+		if query != "" {
+			// Area untuk filter
+			dbQuery = dbQuery.Joins("JOIN categories ON categories.id = photos.category_id").Where("photos.title LIKE ? OR photos.description LIKE ? OR categories.name LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%")
+		}
 
-    // Jika data berhasil di-load, kirimkan data ke template
-    c.HTML(http.StatusOK, "dashboard.html", gin.H{
-        "Photos": photos,
-    })
-})
+		// Mendapat foto2nya
+		if err := dbQuery.Find(&photos).Error; err != nil {
+			c.HTML(http.StatusInternalServerError, "dashboard.html", gin.H{
+				"error":  "Unable to load photos from database",
+				"Photos": []models.Photo{},
+			})
+			return
+		}
 
+		// Jika data berhasil di-load, kirimkan data ke template
+		c.HTML(http.StatusOK, "dashboard.html", gin.H{
+			"Photos":      photos,
+			"SearchQuery": query,
+		})
+	})
 
 	// Route untuk halaman upload
 	router.GET("/upload", func(c *gin.Context) {
@@ -64,19 +71,19 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/api/upload", controllers.AddPhoto)
 
 	// Route untuk halaman edit photo
-router.GET("/edit/:id", func(c *gin.Context) {
-    photoID := c.Param("id")
-    var photo models.Photo
-    if err := config.DB.First(&photo, photoID).Error; err != nil {
-        c.HTML(http.StatusNotFound, "dashboard.html", gin.H{
-            "error": "Photo not found",
-        })
-        return
-    }
-    c.HTML(http.StatusOK, "edit.html", gin.H{
-        "Photo": photo,
-    })
-})
+	router.GET("/edit/:id", func(c *gin.Context) {
+		photoID := c.Param("id")
+		var photo models.Photo
+		if err := config.DB.First(&photo, photoID).Error; err != nil {
+			c.HTML(http.StatusNotFound, "dashboard.html", gin.H{
+				"error": "Photo not found",
+			})
+			return
+		}
+		c.HTML(http.StatusOK, "edit.html", gin.H{
+			"Photo": photo,
+		})
+	})
 
 	// Route untuk proses edit photo
 	router.POST("/api/edit/:id", controllers.EditPhoto)

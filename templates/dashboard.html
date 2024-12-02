@@ -336,13 +336,13 @@
     </header>
 
     <!-- Search Section -->
-    <div class="container search-bar">
-        <input type="text" class="form-control" placeholder="Search by title, category, or description" />
-        <button class="btn btn-primary">Search</button>
-    </div>
+    <form method="GET" action="/dashboard" class="container search-bar">
+        <input type="text" name="query" class="form-control" placeholder="Search by title, category, or description" value="{{.SearchQuery}}" />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
 
-      <!-- Portfolio Section -->
-      <section class="portfolio container mt-5">
+    <!-- Portfolio Section -->
+    <section class="portfolio container mt-5">
         <div class="text-center mb-5">
             <h2 class="section-heading text-uppercase">Your Photos</h2>
         </div>
@@ -372,7 +372,6 @@
         </div>
     </section>
     
-
     <!-- Footer -->
     <footer>
         <div class="container">
