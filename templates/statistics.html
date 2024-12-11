@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Activity Statistics</title>
+    <style>
+        
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1b1f38;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 90%;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #2c2f4c;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #6c63ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #292c51;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table thead {
+            background-color: #6c63ff;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: center;
+            font-size: 1rem;
+            border-bottom: 1px solid #404466;
+        }
+
+        table th {
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #3b3f58;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background-color: #404466;
+        }
+
+        table tbody tr:hover {
+            background-color: #6c63ff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ff6f61;
+            font-size: 1.2em;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back-button a {
+            display: inline-block;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #6c63ff, #845ec2);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button a:hover {
+            background: linear-gradient(135deg, #845ec2, #6c63ff);
+            transform: translateY(-2px);
+        }
+
+        .back-button a:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>User Activity Logs</h1>
+        {{if .Logs}}
+        <div class="chart-container">
+            <canvas id="activityChart" width="400" height="200"></canvas>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Action</th>
+                    <th>Entity</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Logs}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td>{{.UserID}}</td>
+                    <td>{{.Action}}</td>
+                    <td>{{.Entity}}</td>
+                    <td>{{.Timestamp}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        {{else}}
+        <p class="error-message">No activity logs found in the database.</p>
+        {{end}}
+        <div class="back-button">
+            <a href="/dashboard">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        
+        // Data Chart dari Backend
+        const activityCounts = JSON.parse('{{.ActivityCounts}}'); 
+    
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const activityChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(activityCounts), // Labels (Create, Read, Update, Delete)
+                datasets: [{
+                    label: 'Activity Counts',
+                    data: Object.values(activityCounts), // Data (jumlah aktivitas)
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(255, 99, 132, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#ffffff'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = Object.values(activityCounts).reduce((a, b) => a + b, 0);
+                                const percentage = ((context.raw / total) * 100).toFixed(2);
+                                return `${context.label}: ${context.raw} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    
+</body>
+</html>

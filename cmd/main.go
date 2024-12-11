@@ -4,9 +4,21 @@ import (
 	"photo_gallery/config"
 	"photo_gallery/database"
 	"photo_gallery/routes"
+	"encoding/json"
+	"html/template"
 
 	"github.com/gin-gonic/gin"
+
 )
+
+func toJSON(data interface{}) string {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return "{}"
+	}
+	return string(jsonData)
+}
+
 
 func main() {
 	// Connect to database
@@ -17,6 +29,10 @@ func main() {
 
 	// Setup Gin engine
 	router := gin.Default()
+
+	router.SetFuncMap(template.FuncMap{
+		"toJSON": toJSON,
+	})
 
 	// Tambahkan konfigurasi folder template
 	router.LoadHTMLGlob("templates/*")
@@ -30,3 +46,5 @@ func main() {
 	// Jalankan server
 	router.Run(":8080")
 }
+
+

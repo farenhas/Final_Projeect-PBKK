@@ -7,7 +7,7 @@ import (
 )
 
 func Migrate() {
-	err := config.DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Photo{})
+	err := config.DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Photo{}, &models.ActivityLog{})
 	if err != nil {
 		panic("Failed to migrate database!")
 	}

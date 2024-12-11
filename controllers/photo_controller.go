@@ -95,6 +95,18 @@ func AddPhoto(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save photo metadata"})
 		return
 	}
+	logEntry := models.ActivityLog{
+		UserID:    1,               // Ganti dengan User ID sesungguhnya
+		Action:    "Create",        // Aksi yang dilakukan
+		Entity:    "Photo",         // Entitas yang diubah
+		Timestamp: time.Now(),      // Waktu log
+	}
+	if err := config.DB.Create(&logEntry).Error; err != nil {
+		log.Printf("Error logging activity: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log activity"})
+		return
+	}
+
 
 	// Redirect ke dashboard setelah berhasil meng-upload foto
     c.Redirect(http.StatusFound, "/dashboard")
@@ -124,6 +136,18 @@ func EditPhoto(c *gin.Context) {
 
     config.DB.Save(&photo)
 
+	logEntry := models.ActivityLog{
+        UserID:    1,               // Ganti dengan User ID sesungguhnya
+        Action:    "Update",        // Aksi yang dilakukan
+        Entity:    "Photo",         // Entitas yang diubah
+        Timestamp: time.Now(),      // Waktu log
+    }
+    if err := config.DB.Create(&logEntry).Error; err != nil {
+        log.Printf("Error logging activity: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log activity"})
+        return
+    }
+
     c.Redirect(http.StatusFound, "/dashboard")
 }
 
@@ -147,6 +171,18 @@ func DeletePhoto(c *gin.Context) {
     if err := config.DB.Delete(&photo).Error; err != nil {
         log.Printf("Error deleting photo from database: %v", err) // Logging error
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete photo"})
+        return
+    }
+
+	logEntry := models.ActivityLog{
+        UserID:    1,               // Ganti dengan User ID sesungguhnya
+        Action:    "Delete",        // Aksi yang dilakukan
+        Entity:    "Photo",         // Entitas yang dihapus
+        Timestamp: time.Now(),      // Waktu log
+    }
+    if err := config.DB.Create(&logEntry).Error; err != nil {
+        log.Printf("Error logging activity: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log activity"})
         return
     }
 
